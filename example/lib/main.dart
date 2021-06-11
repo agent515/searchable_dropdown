@@ -26,6 +26,27 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final _formKey = GlobalKey<FormState>();
   final _openDropDownProgKey = GlobalKey<DropdownSearchState<String>>();
+  List<String> selectedTypes = ['Any'];
+  static const List<String> typeList = const [
+    'Any',
+    'Homes',
+    'Business & Building',
+    'Condominium',
+    'Duplex',
+    'Farm',
+    'Quadruplex',
+    'Manufactured On Land',
+    'Manufactured Home',
+    'Multi Family',
+    'Mobile Home',
+    'Townhouse',
+    'Triplex',
+    'Twinhome',
+    'Single Family Residence',
+    'Shop Condo',
+    'Land',
+    'Commercial',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +60,45 @@ class _MyHomePageState extends State<MyHomePage> {
           child: ListView(
             padding: EdgeInsets.all(4),
             children: <Widget>[
+              // Multiple Input Dropdown example
+              SearchDropDownMultipleInput(
+                label: "Type",
+                hint: "Type",
+                typeList: typeList,
+                selectedItems: selectedTypes,
+                onChanged: (String? selected) {
+                  String? found;
+                  if (selectedTypes.length > 0) {
+                    found = selectedTypes.firstWhere((element) {
+                      print(element);
+                      return element == selected;
+                    }, orElse: () => 'null');
+                    print("Found: $found");
+                  }
+
+                  if (found == 'null' ||
+                      found != selected && selected != null) {
+                    if (selected == 'Any') {
+                      selectedTypes.clear();
+                    }
+                    if (selected != 'Any') {
+                      selectedTypes.remove('Any');
+                    }
+                    selectedTypes.add(selected!);
+                  } else {
+                    if (selected != 'Any') {
+                      selectedTypes.remove(selected!);
+                      if (selectedTypes.length == 0) {
+                        selectedTypes.add('Any');
+                      }
+                    }
+                  }
+
+                  setState(() {});
+                },
+              ),
+              Divider(),
+
               ///Menu Mode with no searchBox
               DropdownSearch<String>(
                 validator: (v) => v == null ? "required field" : null,
@@ -427,5 +487,85 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     return [];
+  }
+}
+
+class SearchDropDownMultipleInput extends StatelessWidget {
+  const SearchDropDownMultipleInput({
+    Key? key,
+    required this.selectedItems,
+    required this.label,
+    required this.hint,
+    required this.onChanged,
+    required this.typeList,
+  }) : super(key: key);
+
+  final List typeList;
+  final List<String> selectedItems;
+  final String label, hint;
+  final onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(fontSize: 14),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        DropdownSearch<String>(
+          mode: Mode.MENU,
+          showSearchBox: true,
+          maxHeight: 300,
+          closeOnChanged: true,
+          isFilteredOnline: false,
+          searchDelay: Duration(milliseconds: 0),
+          filterFn: (item, filter) => item == null
+              ? false
+              : typeList
+                  .map((e) => e.toLowerCase())
+                  .toList()
+                  .firstWhere((element) => element == item.toLowerCase())
+                  .contains(filter.toLowerCase()),
+          items: [...typeList],
+          dropdownBuilder: (context, selectedItem, itemAsString) =>
+              SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Text(
+              selectedItems.map((element) => element).join(' / '),
+              maxLines: 1,
+            ),
+          ),
+          popupItemBuilder: (context, item, isSelected) => ListTile(
+            title: item == null
+                ? Text('')
+                : Container(
+                    color: !selectedItems.contains(item)
+                        ? null
+                        : Colors.blueAccent,
+                    child: ListTile(
+                      contentPadding: EdgeInsets.all(0),
+                      leading: !selectedItems.contains(item)
+                          ? null
+                          : Icon(
+                              Icons.check,
+                              color: Colors.black,
+                            ),
+                      title: Text(
+                        typeList.firstWhere((element) => element == item),
+                      ),
+                    ),
+                  ),
+          ),
+          onChanged: onChanged,
+          dropdownBuilderSupportsNullItem: true,
+          selectedItem: null,
+        )
+      ],
+    );
   }
 }

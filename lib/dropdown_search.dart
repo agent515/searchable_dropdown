@@ -207,6 +207,9 @@ class DropdownSearch<T> extends StatefulWidget {
   /// whether modal can be dismissed by tapping the modal barrier
   final bool popupBarrierDismissible;
 
+  /// whether dropdown should close itself after onChanged
+  final bool closeOnChanged;
+
   DropdownSearch({
     Key? key,
     this.onSaved,
@@ -261,6 +264,7 @@ class DropdownSearch<T> extends StatefulWidget {
     this.searchFieldProps,
     this.scrollbarProps,
     this.popupBarrierDismissible = true,
+    this.closeOnChanged = false,
   })  : assert(!showSelectedItem || T == String || compareFn != null),
         super(key: key);
 
@@ -543,6 +547,7 @@ class DropdownSearchState<T> extends State<DropdownSearch<T>> {
       favoriteItemsAlignment: widget.favoriteItemsAlignment,
       searchFieldProps: widget.searchFieldProps,
       scrollbarProps: widget.scrollbarProps,
+      closeOnChanged: widget.closeOnChanged,
     );
   }
 
@@ -573,8 +578,7 @@ class DropdownSearchState<T> extends State<DropdownSearch<T>> {
     } else {
       changeItem();
     }
-
-    _handleFocus(false);
+    if (!widget.closeOnChanged) _handleFocus(false);
   }
 
   ///Function that return then UI based on searchMode
@@ -591,7 +595,8 @@ class DropdownSearchState<T> extends State<DropdownSearch<T>> {
     } else {
       selectedItem = await _openSelectDialog(data);
     }
-    _handleFocus(false);
+
+    if (!widget.closeOnChanged) _handleFocus(false);
     widget.onPopupDismissed?.call();
 
     return selectedItem;

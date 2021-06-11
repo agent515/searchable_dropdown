@@ -69,6 +69,9 @@ class SelectDialog<T> extends StatefulWidget {
   /// scrollbar properties
   final ScrollbarProps? scrollbarProps;
 
+  /// whether or not to close the dropdown after onChanged
+  final bool closeOnChanged;
+
   const SelectDialog({
     Key? key,
     this.popupTitle,
@@ -101,6 +104,7 @@ class SelectDialog<T> extends StatefulWidget {
     this.searchBoxStyle,
     this.searchFieldProps,
     this.scrollbarProps,
+    this.closeOnChanged = false,
   }) : super(key: key);
 
   @override
@@ -523,8 +527,9 @@ class _SelectDialogState<T> extends State<SelectDialog<T>> {
   }
 
   void _handleSelectItem(T selectedItem) {
-    Navigator.pop(context, selectedItem);
+    if (!widget.closeOnChanged) Navigator.pop(context, selectedItem);
     if (widget.onChanged != null) widget.onChanged!(selectedItem);
+    if (widget.closeOnChanged) setState(() {});
   }
 
   Widget _favoriteItemDefaultWidget(T? item) {
