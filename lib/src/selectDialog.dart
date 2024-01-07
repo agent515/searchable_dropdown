@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:ui' as ui show BoxHeightStyle, BoxWidthStyle;
-import 'package:dropdown_search/src/scrollbar_props.dart';
-import 'package:dropdown_search/src/text_field_props.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -187,9 +185,6 @@ class _SelectDialogState<T> extends State<SelectDialog<T>> {
                     }
                     return Scrollbar(
                       controller: widget.scrollbarProps?.controller,
-                      isAlwaysShown: widget.scrollbarProps?.isAlwaysShown,
-                      showTrackOnHover: widget.scrollbarProps?.showTrackOnHover,
-                      hoverThickness: widget.scrollbarProps?.hoverThickness,
                       thickness: widget.scrollbarProps?.thickness,
                       radius: widget.scrollbarProps?.radius,
                       notificationPredicate:
